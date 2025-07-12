@@ -1,44 +1,62 @@
-from django.contrib.auth import authenticate
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+from django.utils import timezone
 from .models import Customer, Repairer
-from .serializers import CustomerSerializer, RepairerSerializer
+from .serializers import CustomerSerializer, RepairerSerializer, LoginSerializer
 
-class RegisterCustomer(generics.CreateAPIView):
+class RegisterCustomerView(generics.CreateAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        Token.objects.create(user=user)
-        return Response(
-            {'message': f'Dear {user.username}, you have registered successfully.'},
-            status=status.HTTP_201_CREATED
-        )
+        customer = serializer.save()
+        token, _ = Token.objects.get_or_create(user=customer)
+        return Response({
+            "message": f"Customer {customer.username} registered successfully.",
+            "token": token.key,
+            "user_type": customer.user_type,
+            "dashboard": "customer" if customer.user_type in ['customer', 'both'] else customer.user_type
+        }, status=status.HTTP_201_CREATED)
 
-class RegisterRepairer(generics.CreateAPIView):
+class RegisterRepairerView(generics.CreateAPIView):
     queryset = Repairer.objects.all()
     serializer_class = RepairerSerializer
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        Token.objects.create(user=user)
-        return Response(
-            {'message': f'Dear {user.username}, you have registered successfully.'},
-            status=status.HTTP_201_CREATED
-        )
+        repairer = serializer.save()
+        token, _ = Token.objects.get_or_create(user=repairer)
+        return Response({
+            "message": f"Repairer {repairer.username} registered successfully.",
+            "token": token.key,
+            "user_type": repairer.user_type,
+            "dashboard": "repairer" if repairer.user_type in ['repairer', 'both'] else repairer.user_type
+        }, status=status.HTTP_201_CREATED)
 
 class LoginView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key, 'message': f'Dear {user.first_name}, you have logged in successfully.'}, status=status.HTTP_200_OK)
-        return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, _ = Token.objects.get_or_create(user=user)
+        user.last_login = timezone.now()
+        user.save(update_fields=['last_login'])
+        dashboard = 'admin' if user.user_type == 'admin' else (
+            'both' if user.user_type == 'both' else user.user_type
+        )
+        return Response({
+            "token": token.key,
+            "message": f"Welcome back, {user.first_name}!",
+            "user_type": user.user_type,
+            "dashboard": dashboard
+        })
