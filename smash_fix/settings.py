@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+import cloudinary
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     'user',
     'rest_framework',
     'rest_framework.authtoken',
+    'job',
+    'bids',
+    'cloudinary',
 ]
 
 REST_FRAMEWORK = {
@@ -127,11 +131,26 @@ USE_I18N = True
 
 USE_TZ = True
 
+CLOUDINARY = {
+       'cloud_name': os.getenv("CLOUD_NAME"),
+       'api_key': os.getenv("API_KEY"),
+       'api_secret': os.getenv('API_SECRET'),
+   }
+
+cloudinary.config(
+   cloud_name=CLOUDINARY['cloud_name'],
+   api_key=CLOUDINARY['api_key'],
+   api_secret=CLOUDINARY['api_secret'],
+   secure=True
+)
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_ROOT= BASE_DIR/'media'
+MEDIA_URL= '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

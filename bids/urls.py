@@ -1,9 +1,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import RepairJobViewSet
+from .views import BidViewSet
 
 router = DefaultRouter()
-router.register(r'repair-jobs', RepairJobViewSet)
+router.register(r'bids', BidViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
