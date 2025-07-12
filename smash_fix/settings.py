@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'job',
     'bids',
     'cloudinary',
+    'cloudinary_storage',
 ]
 
 REST_FRAMEWORK = {
@@ -131,18 +132,29 @@ USE_I18N = True
 
 USE_TZ = True
 
-CLOUDINARY = {
-       'cloud_name': os.getenv("CLOUD_NAME"),
-       'api_key': os.getenv("API_KEY"),
-       'api_secret': os.getenv('API_SECRET'),
+CLOUDINARY_STORAGE = {
+       'CLOUD_NAME': os.getenv("CLOUD_NAME"),
+        'API_KEY': os.getenv("API_KEY"),
+        'API_SECRET': os.getenv("API_SECRET"),
    }
 
+print("Cloudinary API Key:", os.getenv("API_KEY"))
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+import cloudinary
+
 cloudinary.config(
-   cloud_name=CLOUDINARY['cloud_name'],
-   api_key=CLOUDINARY['api_key'],
-   api_secret=CLOUDINARY['api_secret'],
-   secure=True
+    cloud_name=os.getenv('CLOUD_NAME'),
+    api_key=os.getenv('API_KEY'),
+    api_secret=os.getenv('API_SECRET'),
+    secure=True
 )
+print("Cloudinary API Key:", os.getenv('API_KEY'))
+print("Cloudinary Cloud Name:", os.getenv('CLOUD_NAME'))
+print("Cloudinary API Secret:", os.getenv('API_SECRET'))
+
 
 
 # Static files (CSS, JavaScript, Images)

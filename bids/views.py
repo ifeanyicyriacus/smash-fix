@@ -1,43 +1,52 @@
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
+from rest_framework import permissions, generics, serializers
 from rest_framework.response import Response
 
-from .models import Bid
-from .serializers import BidSerializer
+from bids.models import Bid
+from bids.serializers import BidSerializer
 from job.models import RepairJob
 
-class BidViewSet(viewsets.ModelViewSet):
-    queryset = Bid.objects.all()
+
+class BidListView(generics.ListAPIView):
     serializer_class = BidSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        status = self.request.query_params.get('status')
+        if status == 'open':
+            return Bid.objects.filter(job__status__in=['open', 'bidding'])
+        return Bid.objects.none()
+
+class BidCreateView(generics.CreateAPIView):
+    serializer_class = BidSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Assign logged-in user as repairer
-        serializer.save(repairer=self.request.user)
+        job_id = self.request.data.get('job')
+        job = RepairJob.objects.get(id=job_id)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    def accept(self, request, pk=None):
-        """
-        Custom action to accept a bid.
-        Only the customer who owns the job can accept a bid.
-        """
+        if job.status not in ['open', 'bidding']:
+            raise serializers.ValidationError("Bidding is closed for this job.")
+
+        if job.status == 'open':
+            job.status = 'bidding'
+            job.save()
+
+        serializer.save(repairer=self.request.user, job=job, status='pending')
+
+class MyBidsListView(generics.ListAPIView):
+    serializer_class = BidSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Bid.objects.filter(repairer=self.request.user)
+
+class BidUpdateView(generics.UpdateAPIView):
+    serializer_class = BidSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Bid.objects.all()
+
+    def patch(self, request, *args, **kwargs):
         bid = self.get_object()
-        job = bid.job
-
-        # Check if the logged-in user is the job owner (customer)
-        if job.customer != request.user:
-            return Response({'error': 'You are not authorized to accept this bid.'}, status=status.HTTP_403_FORBIDDEN)
-
-        # Mark all other bids for the job as rejected
-        Bid.objects.filter(job=job).exclude(id=bid.id).update(status='R')
-
-        # Mark this bid as accepted
-        bid.status = 'A'
-        bid.save()
-
-        # Update job status to ASSIGNED
-        job.status = 'ASSIGNED'
-        job.save()
-
-        return Response({'message': f'Bid {bid.id} accepted for job {job.id}.'}, status=status.HTTP_200_OK)
+        if bid.status != 'pending':
+            return Response({'error': 'Cannot update bid unless it is pending'}, status=400)
+        return super().patch(request, *args, **kwargs)

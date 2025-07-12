@@ -1,35 +1,37 @@
 import uuid
-from django.contrib.postgres.fields import ArrayField
+from typing import TYPE_CHECKING
+
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 class RepairJob(models.Model):
-    JOB_STATUS = (
-        ('OPEN', 'OPEN'),
-        ('BIDDING', 'BIDDING'),
-        ('ASSIGNED', 'ASSIGNED'),
-        ('IN_PROGRESS', 'IN_PROGRESS'),
-        ('REPAIRED', 'REPAIRED'),
-        ('CANCELLED', 'CANCELLED'),
-    )
+    STATUS_CHOICES = [
+        ('open', 'Open'),
+        ('bidding', 'Bidding'),
+        ('assigned', 'Assigned'),
+        ('in_progress', 'In Progress'),
+        ('repaired', 'Repaired'),
+        ('cancelled', 'Cancelled'),
+    ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'customer': True})
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='jobs')
     device_brand = models.CharField(max_length=100)
     device_model = models.CharField(max_length=100)
     issue_description = models.TextField()
     budget = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=15, choices=JOB_STATUS, default='OPEN')
-    image = models.ImageField(upload_to='', null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    image = CloudinaryField('media', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    bid_deadline = models.DateTimeField(null=True, blank=True)
+    bid_deadline = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        if not self.bid_deadline:
+            self.bid_deadline = timezone.now() + timezone.timedelta(hours=48)
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Job {self.id} - {self.device_brand} {self.device_model}"
-
-class RepairJobImage(models.Model):
-    issue_image_video_links = models.FileField(upload_to="phones/images_videos", blank=True, null=True)
-    repair_job = models.ForeignKey(RepairJob, on_delete=models.CASCADE, related_name="images_videos")
-
-    def __str__(self):
-        return f'{self.issue_image_video_links.url}'
+        username = getattr(self.customer, 'username', 'Unknown')
+        return f"Job {self.id} ({self.device_brand} {self.device_model}) by {username}"
