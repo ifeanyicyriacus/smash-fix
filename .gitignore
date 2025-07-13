@@ -39,3 +39,8 @@ static/
 # Operating System files
 .DS_Store
 Thumbs.db
+
+#migrations
+*/migrations/*
+#__pycache__ files
+*/*/__pycache__
