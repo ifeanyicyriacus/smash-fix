@@ -39,3 +39,6 @@ static/
 # Operating System files
 .DS_Store
 Thumbs.db
+
+#migrations
+*/migrations/*
