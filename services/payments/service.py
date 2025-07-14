@@ -1,9 +1,10 @@
 from django.conf import settings
 
 from .interfaces import PaymentGatewayInterface, EscrowInterface
-from .mocks import MockEscrowInterface
+from .mocks import MockEscrowService, MockPaymentGateway
 
-class SquadcoPaymentService(PaymentGatewayInterface):
+
+class SquadcoPaymentGateway(PaymentGatewayInterface):
 
     def accept_payment(self, job_id: str, amount: float):
         pass
@@ -15,7 +16,7 @@ class SquadcoPaymentService(PaymentGatewayInterface):
         pass
 
 
-class EscrowService(EscrowInterface):
+class SquadcoEscrowService(EscrowInterface):
 
     def create_escrow(self, job_id: str, bid_amount: float) -> str:
         pass
@@ -30,6 +31,13 @@ class EscrowService(EscrowInterface):
 class PaymentService:
     def __init__(self):
         if settings.USE_SERVICE_MOCKS:
-            self.gateway = MockEscrowInterface()
+            self.payment_gateway = MockPaymentGateway()
         else:
-            self.gateway = SquadcoPaymentService()
+            self.payment_gateway = SquadcoPaymentGateway()
+
+class EscrowService:
+    def __init__(self):
+        if settings.USE_SERVICE_MOCKS:
+            self.escrow_service = MockEscrowService()
+        else:
+            self.escrow_service = SquadcoEscrowService()

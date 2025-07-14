@@ -2,6 +2,8 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 
 from bids.models import Bid
+from common.event_bus import EventBus
+from job.events import BidAcceptedEvent
 from job.models import RepairJob
 from job.serializers import RepairJobSerializer
 
@@ -12,7 +14,7 @@ class JobCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user, status='open')
-    #     TODO publish event for job created here
+    #     TODO if (needed) publish event for job created here
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
@@ -62,7 +64,11 @@ class AcceptBidView(generics.UpdateAPIView):
         job.status = 'assigned'
         job.save()
 
-        # TODO publish event for accept bid
+        EventBus.publish(BidAcceptedEvent(
+            job_id=job.id,
+            repairer_id=bid.repairer.id,
+            bid_amount=bid.amount
+        ))
 
         return Response({'detail': 'Bid accepted and job assigned'})
 

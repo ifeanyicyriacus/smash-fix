@@ -49,7 +49,7 @@ class MockPaymentGateway(PaymentGatewayInterface):
         return mock_response
 
 
-class MockEscrowInterface(EscrowInterface):
+class MockEscrowService(EscrowInterface):
     def __init__(self):
         self.escrow_transactions: Dict[str, dict] = {}
 

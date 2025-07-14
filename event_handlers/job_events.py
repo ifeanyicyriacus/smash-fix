@@ -1,7 +1,4 @@
-from common.event_bus import EventBus
-from job.events import JobCreatedEvent, JobStatusChangedEvent, BidAcceptedEvent
 
-from typing import Callable
 from common.event_bus import EventBus
 
 

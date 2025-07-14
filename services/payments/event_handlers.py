@@ -2,8 +2,9 @@ from enum import Enum
 
 from common.event_bus import EventBus
 from job.events import BidAcceptedEvent, JobStatusChangedEvent
+from services.payments.events import EscrowCreatedEvent
 from services.payments.interfaces import PaymentGatewayInterface, EscrowInterface
-from services.payments.mocks import MockPaymentGateway, MockEscrowInterface
+from services.payments.mocks import MockPaymentGateway, MockEscrowService
 
 
 class JobStatus(Enum):
@@ -17,25 +18,39 @@ class JobStatus(Enum):
     CANCELLED = 'CANCELLED'
     EXPIRED = 'EXPIRED'
 
+class PaymentEventHandler:
+    """Handles payment-related events for the job system."""
+
+    def __init__(self,
+                 payment_gateway: PaymentGatewayInterface = None,
+                 escrow_service: EscrowInterface = None):
+        self.escrow_service: EscrowInterface = escrow_service or MockEscrowService()
+        self.payment_gateway: PaymentGatewayInterface = payment_gateway or MockPaymentGateway()
+
+    def handle_bid_accepted(self, event:BidAcceptedEvent):
+        """Handle bid accepted event by processing the payment."""
+        self.payment_gateway.accept_payment(
+            job_id=event.job_id,
+            amount=event.bid_amount
+        )
+
+        EventBus.subscribe(BidAcceptedEvent, self.handle_bid_accepted)
+        escrow_id = self.escrow_service.create_escrow(
+            job_id=event.job_id,
+            bid_amount=event.bid_amount
+        )
+
+        EventBus.publish(EscrowCreatedEvent(
+            job_id=event.job_id,
+            escrow_id=escrow_id,
+            amount=event.bid_amount
+        ))
+
+
 class EscrowEventHandler:
     """Handles escrow-related events for the job system."""
     def __init__(self, escrow_service: EscrowInterface = None):
-        self.escrow_service: EscrowInterface = escrow_service or MockEscrowInterface()
-
-
-    def handle_bid_accepted(self, event: BidAcceptedEvent):
-        #Handler for bid acceptance that creates an escrow for the bid amount
-        self.escrow_service.create_escrow(event.job_id, event.bid_amount)
-        # NotificationService.send_notification(
-        #     event.repairer_id,
-        #     "Bid Accepted",
-        #     f"Your bid for job #{event.job_id} has been accepted"
-        # )
-
-    #     call the payment helper
-
-    #     let notification/event_handler also listen to this and all event
-
+        self.escrow_service: EscrowInterface = escrow_service or MockEscrowService()
 
     def handle_job_status_changed(self, event: JobStatusChangedEvent):
         #Handler for job status changes that manages escrow release or cancellation
@@ -46,12 +61,15 @@ class EscrowEventHandler:
 
 
 
-#     def subscribe_to_events(self) -> None:
-#         """Register this handler for relevant events."""
-#         EventBus.subscribe(BidAcceptedEvent, self.handle_bid_accepted)
-#         EventBus.subscribe(JobStatusChangedEvent, self.handle_job_status_changed)
-#
-# def register_handlers():
-#     """Initialize and register all event handlers for the payment service."""
-#     handler = EscrowEventHandler()
-#     handler.subscribe_to_events()
+    def subscribe_to_events(self) -> None:
+        """Register this handler for relevant events."""
+        EventBus.subscribe(JobStatusChangedEvent, self.handle_job_status_changed)
+
+
+def register_handlers():
+    """Initialize and register all event handlers for the payment service."""
+    escrow_handler = EscrowEventHandler()
+    payment_handler = PaymentEventHandler()
+
+    escrow_handler.subscribe_to_events()
+    payment_handler.subscribe_to_events()
