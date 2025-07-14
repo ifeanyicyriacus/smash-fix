@@ -28,27 +28,32 @@ class Notification(models.Model):
         on_delete=models.CASCADE,
         related_name='notifications'
     )
-    status = models.CharField(
-        max_length=10,
-        choices=STATUS_CHOICES,
-        default='PENDING'
-    )
-
     title = models.CharField(max_length=255)
     message = models.TextField()
+    notification_class = models.CharField(
+        max_length=10,
+        choices=NOTIFICATION_CLASS,
+        default='NOTIFICATION'
+    )
     notification_type = models.CharField(
         max_length=5,
         choices=NOTIFICATION_TYPES,
         default='EMAIL'
     )
-    # type
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='PENDING'
+    )
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    error_message = models.TextField(null=True, blank=True)
+
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.title} - {self.recipient.username}"
+        return f"{self.recipient.username} - {self.title} - {self.notification_class}"
 
