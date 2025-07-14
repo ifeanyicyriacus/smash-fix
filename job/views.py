@@ -12,6 +12,7 @@ class JobCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user, status='open')
+    #     TODO publish event for job created here
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
@@ -60,6 +61,8 @@ class AcceptBidView(generics.UpdateAPIView):
         # Update job status
         job.status = 'assigned'
         job.save()
+
+        # TODO publish event for accept bid
 
         return Response({'detail': 'Bid accepted and job assigned'})
 

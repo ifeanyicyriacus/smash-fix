@@ -7,4 +7,4 @@ class PaymentsConfig(AppConfig):
 
     def ready(self):
         from . import event_handlers
-        event_handlers.register_handlers()
+        # event_handlers.register_handlers()
