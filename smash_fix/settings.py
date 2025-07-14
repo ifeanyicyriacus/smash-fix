@@ -47,7 +47,13 @@ INSTALLED_APPS = [
     'bids',
     'cloudinary',
     'cloudinary_storage',
+    'services.logistics',
+    'services.notifications',
+    'services.verification',
+    'services.payments',
 ]
+
+EVENT_BUS_BACKEND = 'common.event_bus.InMemoryEventBus'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
