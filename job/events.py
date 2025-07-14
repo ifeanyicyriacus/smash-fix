@@ -15,3 +15,11 @@ class JobStatusChangedEvent: #handles job expiry...
         self.job_id = job_id
         self.old_status = old_status
         self.new_status = new_status
+
+class JobAssignedEvent: #handles job expiry...
+    def __init__(self, job_id, old_status):
+        JobStatusChangedEvent(job_id=job_id, old_status=old_status, new_status="ASSIGNED")
+
+class JobCompletedEvent: #handles job expiry...
+    def __init__(self, job_id, old_status):
+        JobStatusChangedEvent(job_id=job_id, old_status=old_status, new_status="COMPLETED")

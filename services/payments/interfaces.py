@@ -6,9 +6,11 @@ class PaymentGatewayInterface(ABC):
     def accept_payment(self, job_id: str, amount: float):
         pass
 
+    @abstractmethod
     def initiate_refund(self, job_id:str, amount:float):
         pass
 
+    @abstractmethod
     def process_transfer(self, job_id:str, amount:float, bank_code:str, bank_account:str):
         pass
 

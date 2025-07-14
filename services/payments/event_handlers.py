@@ -17,7 +17,6 @@ class JobStatus(Enum):
     CANCELLED = 'CANCELLED'
     EXPIRED = 'EXPIRED'
 
-
 class EscrowEventHandler:
     """Handles escrow-related events for the job system."""
     def __init__(self, escrow_service: EscrowInterface = None):
@@ -27,6 +26,15 @@ class EscrowEventHandler:
     def handle_bid_accepted(self, event: BidAcceptedEvent):
         #Handler for bid acceptance that creates an escrow for the bid amount
         self.escrow_service.create_escrow(event.job_id, event.bid_amount)
+        # NotificationService.send_notification(
+        #     event.repairer_id,
+        #     "Bid Accepted",
+        #     f"Your bid for job #{event.job_id} has been accepted"
+        # )
+
+    #     call the payment helper
+
+    #     let notification/event_handler also listen to this and all event
 
 
     def handle_job_status_changed(self, event: JobStatusChangedEvent):
@@ -36,12 +44,14 @@ class EscrowEventHandler:
         elif event.new_status in [JobStatus.CANCELLED, JobStatus.EXPIRED]:
             self.escrow_service.cancel_escrow(event.job_id)
 
-    def subscribe_to_events(self) -> None:
-        """Register this handler for relevant events."""
-        EventBus.subscribe(BidAcceptedEvent, self.handle_bid_accepted)
-        EventBus.subscribe(JobStatusChangedEvent, self.handle_job_status_changed)
 
-def register_handlers():
-    """Initialize and register all event handlers for the payment service."""
-    handler = EscrowEventHandler()
-    handler.subscribe_to_events()
+
+#     def subscribe_to_events(self) -> None:
+#         """Register this handler for relevant events."""
+#         EventBus.subscribe(BidAcceptedEvent, self.handle_bid_accepted)
+#         EventBus.subscribe(JobStatusChangedEvent, self.handle_job_status_changed)
+#
+# def register_handlers():
+#     """Initialize and register all event handlers for the payment service."""
+#     handler = EscrowEventHandler()
+#     handler.subscribe_to_events()

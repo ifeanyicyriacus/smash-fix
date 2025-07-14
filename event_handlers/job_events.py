@@ -1,53 +1,49 @@
-# from common.event_bus import EventBus
-# from job.events import JobCreatedEvent, BidAcceptedEvent, JobStatusChangedEvent
-# from services.notifications.interfaces import NotificationService
-# from services.logistics.interfaces import LogisticsService
-# from services.payments.interfaces import PaymentGatewayInterface, EscrowInterface
-#
-#
-# def handle_job_created(event: JobCreatedEvent):
-#     # Notify customer of job creation
-#     NotificationService.send_notification(
-#         event.customer_id,
-#         "Job Created",
-#         f"Your repair job #{event.job_id} has been created successfully"
-#     )
-#
-#     # Initialize logistics tracking
-#     LogisticsService.initialize_job_tracking(event.job_id)
-#
-#
-# def handle_bid_accepted(event: BidAcceptedEvent):
-#     # Setup escrow payment
-#     escrow_id = EscrowInterface.create_escrow(event.job_id, event.bid_amount)
-#
-#     # Notify repairer
-#     NotificationService.send_notification(
-#         event.repairer_id,
-#         "Bid Accepted",
-#         f"Your bid for job #{event.job_id} has been accepted"
-#     )
-#
-#
-# def handle_job_status_changed(event: JobStatusChangedEvent):
-#     if event.new_status == 'COMPLETED':
-#         # Release payment from escrow
-#         EscrowInterface.release_escrow(event.job_id)
-#     elif event.new_status == 'CANCELLED':
-#         # Cancel escrow and refund
-#         EscrowInterface.cancel_escrow(event.job_id)
-#
-#
-# # Register event handlers
-# EventBus.subscribe(JobCreatedEvent, handle_job_created)
-# EventBus.subscribe(BidAcceptedEvent, handle_bid_accepted)
-# EventBus.subscribe(JobStatusChangedEvent, handle_job_status_changed)
 from common.event_bus import EventBus
 from job.events import JobCreatedEvent, JobStatusChangedEvent, BidAcceptedEvent
 
+from typing import Callable
+from common.event_bus import EventBus
 
-def register_handlers():
-    """Initialize and register all event handlers for the job service."""
-    EventBus.subscribe(JobCreatedEvent, handle_job_created)
-    EventBus.subscribe(BidAcceptedEvent, handle_bid_accepted)
-    EventBus.subscribe(JobStatusChangedEvent, handle_job_status_changed)
+
+class EventHandlerRegistry:
+    """Central registry for event handlers with lazy loading to avoid circular imports."""
+
+    @classmethod
+    def register_handlers(cls) -> None:
+        """Register all event handlers with the event bus."""
+        # Lazy import to avoid circular dependencies
+        from services.payments.event_handlers import EscrowEventHandler
+        from services.logistics.event_handlers import LogisticsEventHandler
+        from services.notifications.event_handlers import NotificationsEventHandler
+        from job.events import (
+            JobCreatedEvent, BidAcceptedEvent, JobStatusChangedEvent,
+            JobAssignedEvent, JobCompletedEvent
+        )
+
+        # Initialize handlers only when needed
+        escrow_handler = EscrowEventHandler()
+        logistics_handler = LogisticsEventHandler()
+        notifications_handler = NotificationsEventHandler()
+
+        # Register event handlers
+        EventBus.subscribe(
+            JobCreatedEvent,
+            notifications_handler.handle_job_created
+        )
+        EventBus.subscribe(
+            BidAcceptedEvent,
+            escrow_handler.handle_bid_accepted
+        )
+        EventBus.subscribe(
+            JobStatusChangedEvent,
+            escrow_handler.handle_job_status_changed
+        )
+        EventBus.subscribe(
+            JobAssignedEvent,
+            logistics_handler.handle_job_assigned
+        )
+        EventBus.subscribe(
+            JobCompletedEvent,
+            logistics_handler.handle_job_completed
+        )
+
