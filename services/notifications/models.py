@@ -5,6 +5,7 @@ from django.conf import settings
 class Notification(models.Model):
     NOTIFICATION_CLASS = (
         ('SYSTEM', 'System'),
+        ('USER_REQUEST', 'User Request'),
         ('JOB', 'Job'),
         ('BID', 'Bid'),
         ('RATING', 'Rating'),
@@ -14,6 +15,7 @@ class Notification(models.Model):
     NOTIFICATION_TYPES = (
         ('EMAIL', 'Email'),
         ('SMS', 'SMS'),
+        ('PUSH', 'Push'),
         ('BOTH', 'Both'),
     )
 
@@ -31,9 +33,9 @@ class Notification(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()
     notification_class = models.CharField(
-        max_length=10,
+        max_length=15,
         choices=NOTIFICATION_CLASS,
-        default='NOTIFICATION'
+        default='USER_REQUEST'
     )
     notification_type = models.CharField(
         max_length=5,
