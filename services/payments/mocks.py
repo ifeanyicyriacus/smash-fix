@@ -48,6 +48,9 @@ class MockPaymentGateway(PaymentGatewayInterface):
         self.transactions[transfer_id] = mock_response
         return mock_response
 
+    def process_withdrawal(self, user_id: str, amount: float) -> str:
+        return f"withdraw_mock_{user_id}_{uuid.uuid4().hex[:8]}"
+
 
 class MockEscrowService(EscrowInterface):
     def __init__(self):
