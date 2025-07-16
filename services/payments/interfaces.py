@@ -14,6 +14,10 @@ class PaymentGatewayInterface(ABC):
     def process_transfer(self, job_id:str, amount:float, bank_code:str, bank_account:str):
         pass
 
+    @abstractmethod
+    def process_withdrawal(self, user_id: str, amount: float) -> str:
+        pass
+#     i taught i should implement it here
 
 class EscrowInterface(ABC):
     @abstractmethod
