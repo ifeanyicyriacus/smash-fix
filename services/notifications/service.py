@@ -3,7 +3,7 @@ from .models import Notification
 
 class NotificationService:
     def create_notification(self, user_id: int, title: str, message: str,
-                            notification_type: str, notification_medium: str = 'EMAIL') -> Notification:
+                            notification_type: str, notification_medium: str = 'ALL') -> Notification:
         return Notification.objects.create(
             user_id=user_id,
             title=title,

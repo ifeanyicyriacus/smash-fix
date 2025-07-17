@@ -15,7 +15,7 @@ class Notification(models.Model):
         ('EMAIL', 'Email'),
         ('SMS', 'SMS'),
         ('PUSH', 'Push'),
-        ('BOTH', 'Both'),
+        ('ALL', 'All'),
     )
 
     user = models.ForeignKey(
