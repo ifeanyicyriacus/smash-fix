@@ -2,15 +2,16 @@ import json
 import requests
 from typing import Dict, Any
 
-from services.logistics.interfaces import LogisticsInterface
+from services.logistics.interfaces import LogisticsProviderInterface
 
 
-class ClickNShipLogisticsInterface(LogisticsInterface):
+class ClickNShipLogisticsInterface(LogisticsProviderInterface):
     BASE_URL = "https://api.clicknship.com.ng"
     AUTH_ENDPOINT = "/Token"
     DELIVERY_FEE_ENDPOINT = "/clicknship/Operations/DeliveryFee"
     PICKUP_REQUEST_ENDPOINT = "/clicknship/Operations/PickupRequest"
     PAYMENT_ENDPOINT = "/ClicknShip/NotifyMe/PayWithPayStack"
+    TRACK_SHIPMENT_ENDPOINT = "/clicknship/Operations/TrackShipment"
 
     def __init__(self, username: str = "cnsdemoapiacct", password: str = "ClickNShip$12345"):
         self.username = username
@@ -70,5 +71,14 @@ class ClickNShipLogisticsInterface(LogisticsInterface):
         response = requests.post(f"{self.BASE_URL}{self.PAYMENT_ENDPOINT}",
                                  headers=self._get_headers(),
                                  data=payload)
+        response.raise_for_status()
+        return response.json()
+
+    def get_pickup_request_status(self, waybill_number: str) -> Dict[str, Any]:
+        """Get status of a pickup request."""
+        payload = json.dumps({})
+        response = requests.get(f"{self.BASE_URL}{self.TRACK_SHIPMENT_ENDPOINT}?waybillno={waybill_number}",
+                                headers=self._get_headers(),
+                                data=payload)
         response.raise_for_status()
         return response.json()

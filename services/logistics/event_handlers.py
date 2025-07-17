@@ -1,6 +1,6 @@
 from common.event_bus import EventBus
 from job.events import JobStatusRepairedEvent
-from services.logistics.interfaces import LogisticsInterface
+from services.logistics.interfaces import LogisticsProviderInterface
 from services.logistics.mocks import ClickNShipLogisticsInterface
 from services.payments.events import EscrowCreatedEvent
 
@@ -8,7 +8,7 @@ from services.payments.events import EscrowCreatedEvent
 class LogisticsEventHandler:
     """Handles logistics-related events for the job system."""
 
-    def __init__(self, logistics_service: LogisticsInterface = None):
+    def __init__(self, logistics_service: LogisticsProviderInterface = None):
         self.logistics_service = logistics_service or ClickNShipLogisticsInterface()
 
     def handle_escrow_created(self, event: EscrowCreatedEvent):

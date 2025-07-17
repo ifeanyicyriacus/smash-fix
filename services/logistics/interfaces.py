@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any
 
 
-class LogisticsInterface(ABC):
+class LogisticsProviderInterface(ABC):
 
     @abstractmethod
     def _authenticate(self) -> None:
@@ -20,7 +20,7 @@ class LogisticsInterface(ABC):
         """Calculate delivery fee for a shipment."""
         pass
 
-    @abstractmethod
+    @abstractmethod#assign_courier
     def create_pickup_request(self, order_details: Dict[str, Any]) -> Dict[str, Any]:
         """Submit a pickup request and generate waybill number."""
         pass
@@ -28,4 +28,9 @@ class LogisticsInterface(ABC):
     @abstractmethod
     def initiate_payment(self, waybill_number: str, callback_url: str) -> Dict[str, Any]:
         """Initiate payment through Paystack for a waybill."""
+        pass
+
+    @abstractmethod
+    def get_pickup_request_status(self, waybill_number: str) -> Dict[str, Any]:
+        """Get status of a pickup request."""
         pass
