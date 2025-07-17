@@ -8,7 +8,7 @@ class NotificationInterface(ABC):
         """Send a single notification using the appropriate channel based on the notification type.
 
         Args:
-            notification: Notification object containing recipient, content and delivery preferences
+            notification: Notification object containing user, content and delivery preferences
 
         Returns:
             bool: True if notification was sent successfully, False otherwise

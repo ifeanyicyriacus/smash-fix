@@ -3,59 +3,44 @@ from django.conf import settings
 
 
 class Notification(models.Model):
-    NOTIFICATION_CLASS = (
+    NOTIFICATION_TYPES = (
         ('SYSTEM', 'System'),
-        ('USER_REQUEST', 'User Request'),
-        ('JOB', 'Job'),
-        ('BID', 'Bid'),
+        ('JOB_UPDATE', 'Job Update'),
+        ('BID_UPDATE', 'Bid Update'),
         ('RATING', 'Rating'),
         ('LOGISTICS', 'Logistics'),
     )
 
-    NOTIFICATION_TYPES = (
+    NOTIFICATION_MEDIUM = (
         ('EMAIL', 'Email'),
         ('SMS', 'SMS'),
         ('PUSH', 'Push'),
         ('BOTH', 'Both'),
     )
 
-    STATUS_CHOICES = (
-        ('PENDING', 'Pending'),
-        ('SENT', 'Sent'),
-        ('FAILED', 'Failed'),
-    )
-
-    recipient = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='notifications'
     )
     title = models.CharField(max_length=255)
     message = models.TextField()
-    notification_class = models.CharField(
-        max_length=15,
-        choices=NOTIFICATION_CLASS,
-        default='USER_REQUEST'
-    )
     notification_type = models.CharField(
-        max_length=5,
+        max_length=20,
         choices=NOTIFICATION_TYPES,
+        default='SYSTEM'
+    )
+    notification_medium = models.CharField(
+        max_length=10,
+        choices=NOTIFICATION_MEDIUM,
         default='EMAIL'
     )
-    status = models.CharField(
-        max_length=10,
-        choices=STATUS_CHOICES,
-        default='PENDING'
-    )
+
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    error_message = models.TextField(null=True, blank=True)
-
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.recipient.username} - {self.title} - {self.notification_class}"
-
+        return f"{self.user.username} - {self.title} - {self.notification_type}"

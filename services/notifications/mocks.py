@@ -32,21 +32,21 @@ class MockNotificationService(NotificationInterface):
         success = True
         if notification.notification_type == "SMS" and self.sms_enabled:
             success &= self._send_sms(
-                notification.recipient.phone,
+                notification.user.phone,
                 notification.title,
                 notification.message
             )
 
         if notification.notification_type == "EMAIL" and self.email_enabled:
             success &= self._send_email(
-                notification.recipient.email,
+                notification.user.email,
                 notification.title,
                 notification.message
             )
 
         if notification.notification_type == "PUSH" and self.push_enabled:
             success &= self._send_push_notification(
-                str(notification.recipient.id),
+                str(notification.user.id),
                 notification.title,
                 notification.message
             )
