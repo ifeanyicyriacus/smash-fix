@@ -21,3 +21,9 @@ class InMemoryEventBus(EventBus):
 
 class RedisEventBus(EventBus):
     pass
+
+
+# def subscribe(param):
+#     return None
+def event_bus():
+    return None

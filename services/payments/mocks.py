@@ -2,6 +2,8 @@ from services.payments.interfaces import PaymentGatewayInterface, EscrowInterfac
 from typing import Dict
 import uuid
 
+from services.payments.models import Escrow
+
 
 class MockPaymentGateway(PaymentGatewayInterface):
     def __init__(self):
@@ -55,14 +57,8 @@ class MockEscrowService(EscrowInterface):
         self.escrow_transactions[escrow_id] = mock_escrow
         return escrow_id
 
-    def release_escrow(self, escrow_id: str) -> bool:
-        if escrow_id in self.escrow_transactions:
-            self.escrow_transactions[escrow_id]["status"] = "released"
-            return True
-        return False
+    def release_escrow(self, escrow:Escrow) -> bool:
+        return True
 
-    def cancel_escrow(self, escrow_id: str) -> bool:
-        if escrow_id in self.escrow_transactions:
-            self.escrow_transactions[escrow_id]["status"] = "cancelled"
-            return True
-        return False
+    def cancel_escrow(self, escrow:Escrow) -> bool:
+        return True
