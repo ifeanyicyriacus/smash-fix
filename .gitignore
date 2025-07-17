@@ -24,6 +24,7 @@ pip-delete-this-directory.txt
 .env/
 venv/
 env/
+/.env
 
 # Django-specific files
 *.log
