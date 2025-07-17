@@ -17,14 +17,12 @@ class BidAcceptedEvent(BaseEvent):
         self.repairer_id = repairer_id
         self.bid_amount = bid_amount
 
-
 class JobStatusRepairedEvent(BaseEvent):
     event_name = "job_repaired"
 
-    def __init__(self, job_id, repair_details, **kwargs):
+    def __init__(self, job_id, **kwargs):
         super().__init__(**kwargs)
         self.job_id = job_id
-        self.repair_details = repair_details
 
 class RepairCompletedEvent(BaseEvent):
     event_name = "repair_completed"
