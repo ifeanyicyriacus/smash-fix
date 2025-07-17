@@ -1,11 +1,61 @@
 import json
+import uuid
+
 import requests
 from typing import Dict, Any
 
-from services.logistics.interfaces import LogisticsProviderInterface
+from .interfaces import LogisticsProviderInterface
 
 
-class ClickNShipLogisticsInterface(LogisticsProviderInterface):
+class MockLogisticsProvider(LogisticsProviderInterface):
+    def calculate_delivery_fee(self, origin: str, destination: str, weight: float, pickup_type: str = "1") -> Dict[
+        str, Any]:
+        return {
+            "DeliveryFee": 8761,
+            "VatAmount": 657.075,
+            "TotalAmount": 9418.075
+        }
+
+    def create_pickup_request(self, order_details: Dict[str, Any]) -> Dict[str, Any]:
+        job_id: str = order_details.get("job_id")
+        return {
+            "TransStatus": "Successful",
+            "TransStatusDetails": "Shipment Pickup Request Created Successfully",
+            "OrderNo": job_id,
+            "WaybillNumber": "SA02364035",
+            "DeliveryFee": "3,747.00",
+            "VatAmount": "0.00",
+            "TotalAmount": "3,747.00"
+        }
+
+    def initiate_payment(self, waybill_number: str, callback_url: str) -> Dict[str, Any]:
+        return {
+            "ResponseCode": "00",
+            "ResponseDescription": "Payment Request Successful",
+            "CheckoutURL": "https://checkout.paystack.com/eec1yth5n23igsq",
+            "PaymentRef": "SA00625667_2020-12-23_151150"
+        }
+
+    def get_pickup_request_status(self, waybill_number: str) -> list[dict[str, str]]:
+        return [
+            {
+                "OrderNo": "9993219",
+                "WaybillNumber": "SA00000786",
+                "StatusCode": "477",
+                "StatusDescription": "Pending For Pickup",
+                "StatusDate": "2018-08-27T10:14:42.337"
+            },
+            {
+                "OrderNo": "9993219",
+                "WaybillNumber": "SA00000786",
+                "StatusCode": "06",
+                "StatusDescription": "Shipment Picked Up",
+                "StatusDate": "2018-08-28T06:18:16.39"
+            }
+        ]
+
+
+class ClickNShipLogisticsProvider(LogisticsProviderInterface):
     BASE_URL = "https://api.clicknship.com.ng"
     AUTH_ENDPOINT = "/Token"
     DELIVERY_FEE_ENDPOINT = "/clicknship/Operations/DeliveryFee"
@@ -74,7 +124,7 @@ class ClickNShipLogisticsInterface(LogisticsProviderInterface):
         response.raise_for_status()
         return response.json()
 
-    def get_pickup_request_status(self, waybill_number: str) -> Dict[str, Any]:
+    def get_pickup_request_status(self, waybill_number: str) -> list[dict[str, str]]:
         """Get status of a pickup request."""
         payload = json.dumps({})
         response = requests.get(f"{self.BASE_URL}{self.TRACK_SHIPMENT_ENDPOINT}?waybillno={waybill_number}",

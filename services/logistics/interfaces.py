@@ -3,17 +3,6 @@ from typing import Dict, Any
 
 
 class LogisticsProviderInterface(ABC):
-
-    @abstractmethod
-    def _authenticate(self) -> None:
-        """Authenticate with the Click N Ship API and store the access token."""
-        pass
-
-    @abstractmethod
-    def _get_headers(self) -> Dict[str, str]:
-        """Get headers with authentication token."""
-        pass
-
     @abstractmethod
     def calculate_delivery_fee(self, origin: str, destination: str,
                                weight: float, pickup_type: str = "1") -> Dict[str, Any]:
@@ -31,6 +20,6 @@ class LogisticsProviderInterface(ABC):
         pass
 
     @abstractmethod
-    def get_pickup_request_status(self, waybill_number: str) -> Dict[str, Any]:
+    def get_pickup_request_status(self, waybill_number: str) -> list[dict[str, str]]:
         """Get status of a pickup request."""
         pass
