@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Optional
 import requests
-from services.verification.interfaces import KYCProviderInterface
+from services.verification.interfaces import VerificationProviderInterface
 
 
 @dataclass
@@ -12,11 +12,28 @@ class KYCConfig:
     client_secret: str
 
 
-class MockInterfaceImpl(KYCProviderInterface):
-    """Mock implementation of KYC provider interface."""
+true: bool = True
+false: bool = False
+null: Optional[None] = None
 
+
+class MockVerificationProvider(VerificationProviderInterface):
+    def verify_nin(self, nin: str) -> bool:
+        return True
+
+    def verify_bank_account(self, account_number: str, bank_code: str) -> bool:
+        return True
+
+    def verify_address(self, address_detail: dict[str,str]) -> str:
+        return "1942ab5e-94f7-4efc-9ed6-91f7f8494001"
+
+    def get_physical_address_verification_response(self, reference: str) -> bool:
+        return True
+
+
+class InterSwitchMarketPlaceVerificationProvider(VerificationProviderInterface):
     AUTH_ENDPOINT = "passport/oauth/token"
-    NIN_ENDPOINT = "marketplace-routing/api/v1/verify/identity/nin/verify"
+    NIN_ENDPOINT = "marketplace-routing/api/v1/verify/identity/nin_status/verify"
     BANK_LIST_ENDPOINT = "marketplace-routing/api/v1/verify/identity/account-number/bank-list"
     BANK_VERIFY_ENDPOINT = "marketplace-routing/api/v1/verify/identity/account-number/resolve"
     ADDRESS_ENDPOINT = "marketplace-routing/api/v1/addresses"
@@ -82,7 +99,7 @@ class MockInterfaceImpl(KYCProviderInterface):
     def verify_nin(self, nin: str) -> bool:
         """Verify National Identification Number."""
         response = self._make_request(self.NIN_ENDPOINT, {"id": nin})
-        return response.get("is_valid", False)
+        return response['data']['status'] == 'found'
 
     def verify_bank_account(self, bank_code: str, bank_account: str) -> bool:
         """Verify bank account details."""
@@ -90,13 +107,13 @@ class MockInterfaceImpl(KYCProviderInterface):
             "accountNumber": bank_account,
             "bankCode": bank_code
         })
-        return response.get("is_valid", False)
+        return response['data']['status'] == 'found'
 
-    def verify_physical_address(self, physical_address: str) -> bool:
+    def verify_address(self, address_detail: dict[str,str]) -> str:
         """Verify physical address."""
         response = self._make_request(self.ADDRESS_ENDPOINT, {
             "customerReference": "adrsdts",
-            "street": physical_address,
+            "street": address_detail,
             "stateName": "Lagos",
             "lgaName": "mushin",
             "landmark": "mushin",
@@ -110,9 +127,9 @@ class MockInterfaceImpl(KYCProviderInterface):
                 "phone": "+2349012345678"
             }
         })
-        return response.get("is_valid", False)
+        return response["data"]["customerReference"]
 
-    def get_physical_address_verification_response(self, reference_id: str) -> Dict:
+    def get_physical_address_verification_response(self, reference_id: str) -> bool:
         """Get full physical address verification response.
         
         Args:
@@ -131,6 +148,7 @@ class MockInterfaceImpl(KYCProviderInterface):
                 params={"reference": reference_id}
             )
             response.raise_for_status()
-            return response.json()
+            # unwrap response and save into an unstructured database
+            return response.json()["data"]["summary"]["address_check"] == "SUCCESS"
         except requests.RequestException as e:
             raise ConnectionError(f"Address verification request failed: {e}")
