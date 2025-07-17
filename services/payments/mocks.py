@@ -20,19 +20,6 @@ class MockPaymentGateway(PaymentGatewayInterface):
         self.transactions[transaction_id] = mock_response
         return mock_response
 
-    def initiate_refund(self, job_id: str, amount: float):
-        refund_id = str(uuid.uuid4())
-        mock_response = {
-            "status": "success",
-            "refund_id": refund_id,
-            "amount": amount,
-            "currency": "NGN",
-            "refund_status": "processed",
-            "job_id": job_id
-        }
-        self.transactions[refund_id] = mock_response
-        return mock_response
-
     def process_transfer(self, job_id: str, amount: float, bank_code: str, bank_account: str):
         transfer_id = str(uuid.uuid4())
         mock_response = {

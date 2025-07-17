@@ -26,6 +26,8 @@ class RepairJob(models.Model):
     image = CloudinaryField('media', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     bid_deadline = models.DateTimeField(default=timezone.now)
+    # blend it in later
+    selected_bid = models.ForeignKey('bids.Bid', on_delete=models.SET_NULL, null=True, related_name='job')
 
     def save(self, *args, **kwargs):
         if not self.bid_deadline:

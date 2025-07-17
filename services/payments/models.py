@@ -1,16 +1,7 @@
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
 from job.models import RepairJob
 from user.models import Repairer
 from django.db import models
 from django.conf import settings
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_user_wallet(sender, instance, created, **kwargs):
-    if created:
-        Wallet.objects.create(user=instance)
 
 class Wallet(models.Model):
     user = models.OneToOneField(
@@ -18,8 +9,8 @@ class Wallet(models.Model):
         on_delete=models.PROTECT,
         related_name='wallet'
     )
-    bank_name = models.CharField(max_length=100)
-    bank_account_number = models.CharField(max_length=20)
+    bank_name = models.CharField(max_length=100, null=True, blank=True)
+    bank_account_number = models.CharField(max_length=20, null=True, blank=True)
 
     available_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     escrow_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -54,8 +45,8 @@ class Escrow(models.Model):
         ('RELEASED', 'Funds Released'),
         ('REFUNDED', 'Funds Refunded'),
     ]
-
     job_id = models.CharField(max_length=36)  # UUID from external system
+    repairer_wallet_id = models.CharField(max_length=36)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=ESCROW_STATUS, default='HELD')
     created_at = models.DateTimeField(auto_now_add=True)

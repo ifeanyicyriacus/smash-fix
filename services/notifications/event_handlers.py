@@ -2,14 +2,14 @@ from common.event_bus import EventBus
 from job.events import BidAcceptedEvent
 from services.payments.events import EscrowCreatedEvent
 from services.notifications.interfaces import NotificationInterface
-from services.notifications.mocks import MockNotificationInterface
+from services.notifications.mocks import MockNotificationService
 
 
 class NotificationEventHandler:
     """Handles notification-related events for the job system."""
 
     def __init__(self, notification_service: NotificationInterface = None):
-        self.notification_service: NotificationInterface = notification_service or MockNotificationInterface()
+        self.notification_service: NotificationInterface = notification_service or MockNotificationService()
 
     def handle_bid_accepted(self, event: BidAcceptedEvent):
         """Handle bid accepted event by sending notifications."""

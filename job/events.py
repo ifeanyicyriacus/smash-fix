@@ -26,6 +26,14 @@ class JobStatusRepairedEvent(BaseEvent):
         self.job_id = job_id
         self.repair_details = repair_details
 
+class RepairCompletedEvent(BaseEvent):
+    event_name = "repair_completed"
+
+    def __init__(self, job_id, repair_details, **kwargs):
+        super().__init__(**kwargs)
+        self.job_id = job_id
+        self.repair_details = repair_details
+
 # class JobStatusChangedEvent(BaseEvent):  #handles job expiry...
 #     event_name = "job_status_changed"
 #
