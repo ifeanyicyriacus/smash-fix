@@ -4,6 +4,14 @@ from typing import Dict, Any
 
 class LogisticsProviderInterface(ABC):
     @abstractmethod
+    def get_courier_id(self):
+        pass
+
+    @abstractmethod
+    def get_tracking_url(self, waybill_number: str):
+        pass
+
+    @abstractmethod
     def calculate_delivery_fee(self, origin: str, destination: str,
                                weight: float, pickup_type: str = "1") -> Dict[str, Any]:
         """Calculate delivery fee for a shipment."""

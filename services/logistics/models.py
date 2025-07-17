@@ -19,3 +19,12 @@ class LogisticsAssignment(models.Model):
     status = models.CharField(max_length=20, choices=LOGISTICS_STATUS, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    vat_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+class DeliveryFee(models.Model):
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    vat_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+

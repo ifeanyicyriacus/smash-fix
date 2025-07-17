@@ -20,8 +20,15 @@ class User(AbstractUser):
 
 
 class Customer(User):
-    pickup_address = models.CharField(max_length=255)
+    pickup_address = models.CharField(max_length=255)#"Liberty Estate, Ago Palace Way, Okota"
+    pickup_town = models.CharField(max_length=255)#"4321"
+    pickup_city = models.CharField(max_length=255)#"LAGOS MAINLAND"
+    pickup_state = models.CharField(max_length=255)#"LAGOS MAINLAND"
+
     delivery_address = models.CharField(max_length=255)
+    delivery_town = models.CharField(max_length=255)
+    delivery_city = models.CharField(max_length=255)
+    delivery_state = models.CharField(max_length=255)
 
     class Meta:
         verbose_name = "Customer"
@@ -37,7 +44,10 @@ class Repairer(User):
     rating = models.FloatField(default=0.0, editable=False)
     field = models.CharField(max_length=20, choices=FIELD_CHOICES)
     verification_id = models.CharField(max_length=50, unique=True)
-    work_address = models.CharField(max_length=255)
+    work_address = models.CharField(max_length=255)#"Slot, Computer Village, Ikeja"
+    work_town = models.CharField(max_length=255)#"4262"
+    work_city = models.CharField(max_length=255)#"LAGOS MAINLAND"
+    work_state = models.CharField(max_length=255)#"LAGOS MAINLAND"
 
     class Meta:
         verbose_name = "Repairer"

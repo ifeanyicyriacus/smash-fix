@@ -8,6 +8,12 @@ from .interfaces import LogisticsProviderInterface
 
 
 class MockLogisticsProvider(LogisticsProviderInterface):
+    def get_courier_id(self):
+        return 'MockLogisticsProvider'
+
+    def get_tracking_url(self, waybill_number: str):
+        return f'https://MockLogisticsProvider.com/{waybill_number}'
+
     def calculate_delivery_fee(self, origin: str, destination: str, weight: float, pickup_type: str = "1") -> Dict[
         str, Any]:
         return {
@@ -63,7 +69,7 @@ class ClickNShipLogisticsProvider(LogisticsProviderInterface):
     PAYMENT_ENDPOINT = "/ClicknShip/NotifyMe/PayWithPayStack"
     TRACK_SHIPMENT_ENDPOINT = "/clicknship/Operations/TrackShipment"
 
-    def __init__(self, username: str = "cnsdemoapiacct", password: str = "ClickNShip$12345"):
+    def __init__(self, username: str, password: str):
         self.username = username
         self.password = password
         self.access_token = None
@@ -86,6 +92,12 @@ class ClickNShipLogisticsProvider(LogisticsProviderInterface):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.access_token}'
         }
+
+    def get_courier_id(self):
+        return 'ClickNShipLogisticsProvider'
+
+    def get_tracking_url(self, waybill_number: str):
+        return "coming-soon: our own url (to our page)"
 
     def calculate_delivery_fee(self, origin: str, destination: str,
                                weight: float, pickup_type: str = "1") -> Dict[str, Any]:
