@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'services.payments',
 ]
 
-EVENT_BUS_BACKEND = 'common.event_bus.InMemoryEventBus' #or RedisEventBus
+EVENT_BUS_BACKEND = 'common.event_bus.EventBus'
 USE_SERVICE_MOCKS = True
 
 REST_FRAMEWORK = {

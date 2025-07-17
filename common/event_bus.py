@@ -1,29 +1,26 @@
-from typing import List, Callable, Dict
-from .events import BaseEvent
+from typing import Type, Callable, Any
+
 
 class EventBus:
-    _subscribers:Dict[str, List[Callable]] = {}
+    _subscribers = {}
 
     @classmethod
-    def subscribe(cls, event_type:str, handler:Callable):
-        if event_type not in cls._subscribers:
-            cls._subscribers[event_type] = []
-        cls._subscribers[event_type].append(handler)
+    def subscribe(cls, event_type: Type):
+        def decorator(handler: Callable):
+            if event_type not in cls._subscribers:
+                cls._subscribers[event_type] = []
+            cls._subscribers[event_type].append(handler)
+            return handler
+
+        return decorator
 
     @classmethod
-    def publish(cls, event:BaseEvent):
-        if event.type in cls._subscribers:
-            for handler in cls._subscribers[event.type]:
+    def publish(cls, event: Any):
+        event_type = type(event)
+        if event_type in cls._subscribers:
+            for handler in cls._subscribers[event_type]:
                 handler(event)
 
-class InMemoryEventBus(EventBus):
-    pass
 
-class RedisEventBus(EventBus):
-    pass
-
-
-# def subscribe(param):
-#     return None
-def event_bus():
-    return None
+# Singleton instance
+event_bus = EventBus()

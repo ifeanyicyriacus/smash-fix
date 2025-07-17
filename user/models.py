@@ -52,3 +52,4 @@ class Repairer(User):
     class Meta:
         verbose_name = "Repairer"
         verbose_name_plural = "Repairers"
+        ordering = ['-rating']

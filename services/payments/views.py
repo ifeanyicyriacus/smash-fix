@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -7,7 +8,10 @@ from services.payments.service import PaymentService
 
 from .serializers import WalletSerializer, TransactionSerializer
 
+
 class WalletView:
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         wallet = Wallet.objects.get(user=request.user)
         serializer = WalletSerializer(wallet)
@@ -15,6 +19,8 @@ class WalletView:
 
 
 class WithdrawView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         user_id = request.user.id
         amount = request.data.get('amount')
