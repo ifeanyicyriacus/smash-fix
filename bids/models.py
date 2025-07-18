@@ -20,7 +20,7 @@ class Bid(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    job = models.ForeignKey(RepairJob, on_delete=models.CASCADE, related_name='bids')
+    # job = models.ForeignKey(RepairJob, on_delete=models.CASCADE, related_name='bids')
     repairer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bids')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     duration_of_repair = models.DurationField(help_text='Estimated repair duration')

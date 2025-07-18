@@ -20,15 +20,15 @@ class User(AbstractUser):
 
 
 class Customer(User):
-    pickup_address = models.CharField(max_length=255)#"Liberty Estate, Ago Palace Way, Okota"
-    pickup_town = models.CharField(max_length=255)#"4321"
-    pickup_city = models.CharField(max_length=255)#"LAGOS MAINLAND"
-    pickup_state = models.CharField(max_length=255)#"LAGOS MAINLAND"
+    pickup_address = models.CharField(max_length=255, default='')#"Liberty Estate, Ago Palace Way, Okota"
+    pickup_town = models.CharField(max_length=255, default='')#"4321"
+    pickup_city = models.CharField(max_length=255, default='')#"LAGOS MAINLAND"
+    pickup_state = models.CharField(max_length=255, default='')#"LAGOS MAINLAND"
 
-    delivery_address = models.CharField(max_length=255)
-    delivery_town = models.CharField(max_length=255)
-    delivery_city = models.CharField(max_length=255)
-    delivery_state = models.CharField(max_length=255)
+    delivery_address = models.CharField(max_length=255, default='')
+    delivery_town = models.CharField(max_length=255, default='')
+    delivery_city = models.CharField(max_length=255, default='')
+    delivery_state = models.CharField(max_length=255, default='')
 
     class Meta:
         verbose_name = "Customer"
@@ -44,10 +44,10 @@ class Repairer(User):
     rating = models.FloatField(default=0.0, editable=False)
     field = models.CharField(max_length=20, choices=FIELD_CHOICES)
     verification_id = models.CharField(max_length=50, unique=True)
-    work_address = models.CharField(max_length=255)#"Slot, Computer Village, Ikeja"
-    work_town = models.CharField(max_length=255)#"4262"
-    work_city = models.CharField(max_length=255)#"LAGOS MAINLAND"
-    work_state = models.CharField(max_length=255)#"LAGOS MAINLAND"
+    work_address = models.CharField(max_length=255, default='')#"Slot, Computer Village, Ikeja"
+    work_town = models.CharField(max_length=255, default='')#"4262"
+    work_city = models.CharField(max_length=255, default='')#"LAGOS MAINLAND"
+    work_state = models.CharField(max_length=255, default='')#"LAGOS MAINLAND"
 
     class Meta:
         verbose_name = "Repairer"

@@ -5,7 +5,7 @@ class EventBus:
     _subscribers = {}
 
     @classmethod
-    def subscribe(cls, event_type: Type):
+    def subscribe(cls, event_type: Type, handler):
         def decorator(handler: Callable):
             if event_type not in cls._subscribers:
                 cls._subscribers[event_type] = []
