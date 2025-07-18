@@ -24,6 +24,7 @@ pip-delete-this-directory.txt
 .env/
 venv/
 env/
+/.env
 
 # Django-specific files
 *.log
@@ -41,6 +42,6 @@ static/
 Thumbs.db
 
 #migrations
-*/migrations/*
+*/migrations
 #__pycache__ files
 */*/__pycache__

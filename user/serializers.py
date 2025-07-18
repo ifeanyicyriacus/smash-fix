@@ -97,11 +97,11 @@ class RepairerSerializer(serializers.ModelSerializer):
 
             repairer = Repairer.objects.create(
                 user_ptr=existing_user,
-                nin=validated_data['nin'],
+                nin=validated_data['nin_status'],
                 field=validated_data['field'],
                 wallet_id=validated_data['wallet_id'],
                 verification_id=validated_data['verification_id'],
-                work_address=validated_data['work_address'],
+                work_address=validated_data['work_address_status'],
             )
             return repairer
 
