@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from services.payments.models import Wallet, Transaction, Escrow
 
-
 class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet

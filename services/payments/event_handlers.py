@@ -1,10 +1,10 @@
 from common.event_bus import EventBus
 from job.events import BidAcceptedEvent, RepairCompletedEvent
 
-from services.payments.mocks import MockPaymentGateway, MockEscrowService
+from services.payments.interface_impl.mocks import MockPaymentGateway, MockSystemPaymentService
 from services.payments.models import Escrow
 
-escrow_service = MockEscrowService()
+escrow_service = MockSystemPaymentService()
 payment_gateway = MockPaymentGateway()
 
 

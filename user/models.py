@@ -43,7 +43,7 @@ class Repairer(User):
     nin = models.CharField(max_length=20, unique=True)
     rating = models.FloatField(default=0.0, editable=False)
     field = models.CharField(max_length=20, choices=FIELD_CHOICES)
-    verification_id = models.CharField(max_length=50, unique=True)
+    # verification_id = models.CharField(max_length=50, unique=True)
     work_address = models.CharField(max_length=255, default='')#"Slot, Computer Village, Ikeja"
     work_town = models.CharField(max_length=255, default='')#"4262"
     work_city = models.CharField(max_length=255, default='')#"LAGOS MAINLAND"

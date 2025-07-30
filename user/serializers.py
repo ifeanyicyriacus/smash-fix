@@ -71,7 +71,7 @@ class RepairerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Repairer
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'password',
-                  'nin', 'rating', 'field', 'wallet_id', 'verification_id', 'work_address', 'user_type']
+                  'nin', 'rating', 'field', 'work_address', 'user_type']
 
     def create(self, validated_data):
         password = validated_data.pop('password')

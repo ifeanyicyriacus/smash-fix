@@ -1,4 +1,4 @@
-from services.payments.interfaces import PaymentGatewayInterface, EscrowInterface
+from services.payments.interfaces import PaymentGatewayInterface, SystemPaymentInterface
 from typing import Dict
 import uuid
 
@@ -37,11 +37,9 @@ class MockPaymentGateway(PaymentGatewayInterface):
         self.transactions[transfer_id] = mock_response
         return mock_response
 
-    def process_withdrawal(self, user_id: str, amount: float) -> str:
-        return f"withdraw_mock_{user_id}_{uuid.uuid4().hex[:8]}"
 
 
-class MockEscrowService(EscrowInterface):
+class MockSystemPaymentService(SystemPaymentInterface):
     def __init__(self):
         self.escrow_transactions: Dict[str, dict] = {}
 
@@ -62,3 +60,6 @@ class MockEscrowService(EscrowInterface):
 
     def cancel_escrow(self, escrow:Escrow) -> bool:
         return True
+
+    def process_withdrawal(self, user_id: str, amount: float) -> str:
+        return f"withdraw_mock_{user_id}_{uuid.uuid4().hex[:8]}"
