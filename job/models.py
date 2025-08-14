@@ -1,5 +1,4 @@
 import uuid
-from typing import TYPE_CHECKING
 
 from django.db import models
 from django.conf import settings
@@ -18,14 +17,17 @@ class RepairJob(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='jobs')
-    device_brand = models.CharField(max_length=100)
-    device_model = models.CharField(max_length=100)
+    device_brand = models.CharField(max_length=100, default='')
+    device_model = models.CharField(max_length=100, default='')
+    device_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     issue_description = models.TextField()
-    budget = models.DecimalField(max_digits=10, decimal_places=2)
+    budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
     image = CloudinaryField('media', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     bid_deadline = models.DateTimeField(default=timezone.now)
+    # blend it in later
+    selected_bid = models.ForeignKey('bids.Bid', on_delete=models.SET_NULL, null=True, related_name='job')
 
     def save(self, *args, **kwargs):
         if not self.bid_deadline:

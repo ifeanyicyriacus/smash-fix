@@ -47,7 +47,14 @@ INSTALLED_APPS = [
     'bids',
     'cloudinary',
     'cloudinary_storage',
+    'services.logistics',
+    'services.notifications',
+    'services.verification',
+    'services.payments',
 ]
+
+EVENT_BUS_BACKEND = 'common.event_bus.EventBus'
+USE_SERVICE_MOCKS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -170,4 +177,7 @@ MEDIA_URL= '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+CLICKNSHIP_USERNAME = os.getenv("CLICKNSHIP_USERNAME")
+CLICKNSHIP_PASSWORD = os.getenv("CLICKNSHIP_PASSWORD")
 
